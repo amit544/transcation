@@ -1,0 +1,59 @@
+version: "3.9" # optional since v1.27.0
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports: 
+      - '5432:5432'
+    # volumes:
+    #   - addressbook-db:/var/lib/postgresql/data
+# services:
+  # postgres:
+  #     image: postgres
+  #     container_name: postgres
+  #     volumes:
+  #       - postgres_data12:/var/lib/postgresql/data
+  #       - ${PWD}/create-multiple-postgresql-databases.sh:/docker-entrypoint-initdb.d/create-multiple-postgresql-databases.sh
+  #     environment:
+  #       # POSTGRES_DB: keycamunda
+  #       POSTGRES_MULTIPLE_DATABASES: keycloak
+  #       POSTGRES_USER: admin
+  #       POSTGRES_PASSWORD: password
+  #     networks:
+  #       - docker-elk
+  #     ports:
+  #       - 5432:5432
+
+
+  service1:
+    container_name: service1
+    build:
+      context: ./
+      args:
+        app_env: ${NODE_ENV}
+    volumes:
+      - "./:/usr/src/app/"
+    ports:
+      - "3001:3001"
+    networks:
+      - docker-elk
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-file: "5"
+        max-size: "10m"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.80"
+          memory: 1g
+      # - postgres
+      # - keycloak
+networks:
+  docker-elk:
+    driver: bridge
+
